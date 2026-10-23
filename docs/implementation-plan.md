@@ -17,4 +17,4 @@ dry-run/cancellation writes nothing; invalid arguments fail before writes.
 - [x] RED: filesystem tests; implement renderer/install/doctor/uninstall; GREEN; commit.
 - [x] RED: CLI tests; implement bilingual wizard/launchers/docs/CI; GREEN; commit.
 - [x] Fresh review and regression fixes; validate actual agy plugin.
-- [ ] Create public GitHub repository, push, tag, release ZIP; verify synchronization.
+- [x] Create public GitHub repository, push, tag, release ZIP; verify synchronization.

@@ -23,8 +23,10 @@ unrelated-symlink detection. Regression tests reproduced all four before fixes.
 All four were fixed and the complete suite passed afterward.
 
 ## Limits
-CI configuration targets Windows/macOS/Linux on Node 20/22/24; until Actions
-finishes, local Windows results are the observed evidence. No live quota reading,
+All nine Windows/macOS/Linux × Node 20/22/24 matrix jobs passed.
+Evidence: https://github.com/zinda2000/antigravity-lean/actions/runs/39931053534
+Release: https://github.com/zinda2000/antigravity-lean/releases/tag/v0.1.0
+The release ZIP was also tested after clean extraction. No live quota reading,
 family aggregation, automatic model switching, or measured savings was tested or claimed.
 
 ## Implementation decisions
