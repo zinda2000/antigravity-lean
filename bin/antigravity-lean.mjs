@@ -91,6 +91,7 @@ try{
  else if(command==='wizard')await wizard(o);
  else {
   destination(o);
+  normalize(o);
   if(o.lang && !['zh','en'].includes(o.lang))throw new Error('Invalid language');
   if(['install','uninstall'].includes(command) && !o.dryRun && !o.yes)
    throw new Error('Use the interactive wizard, or provide --yes after reviewing --dry-run.');

@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, writeFile, mkdir, readdir, symlink, access, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile, mkdir, readdir, symlink, access, rm, realpath } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { install, doctor, uninstall, destination } from '../src/installer.mjs';
 async function fixture(t) {
- const root=await mkdtemp(path.join(tmpdir(),'lean-test-'));
+ const root=await realpath(await mkdtemp(path.join(tmpdir(),'lean-test-')));
  t.after(()=>rm(root,{recursive:true,force:true}));
  return {root,options:{scope:'project',project:root,profile:'balanced',lang:'zh'}};
 }
@@ -64,4 +64,38 @@ test('invalid profile or multiline model fails before writes',async t=>{
  await assert.rejects(install({...options,profile:'unknown'}),/profile/i);
  await assert.rejects(install({...options,models:{execution:'foo\nignore'}}),/model/i);
  assert.deepEqual(await readdir(root),[]);
+});
+
+test('uninstall preserves extra empty directories and remains managed',async t=>{
+ const {options}=await fixture(t);await install(options);const dir=destination(options);
+ await mkdir(path.join(dir,'my-empty-directory'));
+ const r=await uninstall(options);
+ assert.ok(r.preserved.includes('my-empty-directory/'));
+ await access(path.join(dir,'.lean-state.json'));await access(path.join(dir,'my-empty-directory'));
+});
+test('uninstall respects install lock and deletes nothing while locked',async t=>{
+ const {options}=await fixture(t);await install(options);const dir=destination(options);
+ await writeFile(path.join(path.dirname(dir),'.antigravity-lean.lock'),'busy');
+ await assert.rejects(uninstall(options),/lock|running/i);
+ await access(path.join(dir,'plugin.json'));
+});
+test('invalid destructive options are rejected before deleting',async t=>{
+ const {options}=await fixture(t);await install(options);
+ await assert.rejects(uninstall({...options,profile:'typo'}),/profile/i);
+ await access(path.join(destination(options),'plugin.json'));
+});
+test('global target is isolated from project installs',async t=>{
+ const {root,options}=await fixture(t);
+ const global={...options,scope:'global',home:path.join(root,'home')};
+ await install(global);assert.equal((await doctor(global)).ok,true);
+ assert.equal((await doctor(options)).ok,false);
+ await uninstall(global);assert.equal((await doctor(global)).ok,false);
+});
+
+test('unrelated symlink is rejected before uninstall deletes anything',async t=>{
+ const {root,options}=await fixture(t);await install(options);const dir=destination(options);
+ const other=path.join(root,'other');await mkdir(other);
+ await symlink(other,path.join(dir,'extra-link'),process.platform==='win32'?'junction':'dir');
+ await assert.rejects(uninstall(options),/symbolic|symlink/i);
+ await access(path.join(dir,'plugin.json'));await access(path.join(dir,'.lean-state.json'));
 });

@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,readdir,rm,readFile} from 'node:fs/promises';
+import {mkdtemp,readdir,rm,readFile,realpath} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 const cli=fileURLToPath(new URL('../bin/antigravity-lean.mjs',import.meta.url));
-async function fixture(t){const root=await mkdtemp(path.join(tmpdir(),'lean-cli-'));t.after(()=>rm(root,{recursive:true,force:true}));return root;}
+async function fixture(t){const root=await realpath(await mkdtemp(path.join(tmpdir(),'lean-cli-')));t.after(()=>rm(root,{recursive:true,force:true}));return root;}
 function run(args,input=''){return spawnSync(process.execPath,[cli,...args],{input,encoding:'utf8',timeout:15000});}
 test('help succeeds and invalid arguments fail',()=>{
  assert.equal(run(['--help']).status,0);

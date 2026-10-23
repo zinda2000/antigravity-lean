@@ -2,7 +2,7 @@ import { lstat, readFile, writeFile, mkdir, readdir, rename, unlink, rmdir, mkdt
 import path from 'node:path';
 import os from 'node:os';
 import { createHash, randomUUID } from 'node:crypto';
-import { render } from './profiles.mjs';
+import { render, normalize } from './profiles.mjs';
 
 const STATE='.lean-state.json';
 const ALLOWED=new Set(['plugin.json','rules/context-hygiene.md','rules/model-routing.md','skills/plan-handoff/SKILL.md','agents/lean-explorer.md']);
@@ -113,23 +113,32 @@ export async function install(options={}) {
  }
 }
 export async function uninstall(options={}) {
+ normalize(options);
  const dir=destination(options);await noLinks(dir);
  if(!await stat(dir))return {action:'not-installed',destination:dir,preserved:[]};
- const state=await stateAt(dir);const preserved=[];
- // Preflight all paths before deleting anything.
- for(const file of Object.keys(state.files))await noLinks(path.join(dir,file));
- if(options.dryRun)return {action:'preview-uninstall',destination:dir,files:Object.keys(state.files),preserved:[]};
- for(const [file,digest] of Object.entries(state.files)) {
-  const target=path.join(dir,file);const s=await stat(target);
-  if(!s)continue;
-  if(s.isFile() && hash(await readFile(target))===digest)await unlink(target);
-  else preserved.push(file);
- }
- // Remove only empty known directories. Never recursively delete a user plugin.
- for(const sub of ['skills/plan-handoff','skills','agents','rules']) {
-  try{await rmdir(path.join(dir,sub));}catch(e){if(!['ENOENT','ENOTEMPTY','EEXIST'].includes(e.code))throw e;}
- }
- const remaining=(await inventory(dir)).filter(f=>f!==STATE);
- if(!remaining.length) {await unlink(path.join(dir,STATE));await rmdir(dir);}
- return {action:'uninstalled',destination:dir,preserved:[...new Set([...preserved,...remaining])]};
+ // Preview and full inventory happen before any mutation, including lock creation.
+ await stateAt(dir);await inventory(dir);
+ if(options.dryRun)return {action:'preview-uninstall',destination:dir,files:Object.keys((await stateAt(dir)).files),preserved:[]};
+ const lock=path.join(path.dirname(dir),'.antigravity-lean.lock');
+ const handle=await import('node:fs/promises').then(fs=>fs.open(lock,'wx')).catch(e=>{
+  if(e.code==='EEXIST')throw new Error('Another mutation is running, or stale lock exists: '+lock);throw e;
+ });
+ try {
+  await noLinks(dir);const state=await stateAt(dir);await inventory(dir);
+  const preserved=[];
+  for(const file of Object.keys(state.files))await noLinks(path.join(dir,file));
+  for(const [file,digest] of Object.entries(state.files)) {
+   const target=path.join(dir,file);const s=await stat(target);
+   if(!s)continue;
+   if(s.isFile() && hash(await readFile(target))===digest)await unlink(target);
+   else preserved.push(file);
+  }
+  for(const sub of ['skills/plan-handoff','skills','agents','rules']) {
+   try{await rmdir(path.join(dir,sub));}catch(e){if(!['ENOENT','ENOTEMPTY','EEXIST'].includes(e.code))throw e;}
+  }
+  const entries=(await readdir(dir,{withFileTypes:true})).filter(e=>e.name!==STATE);
+  const remaining=await inventory(dir);
+  if(!entries.length){await unlink(path.join(dir,STATE));await rmdir(dir);}
+  return {action:'uninstalled',destination:dir,preserved:[...new Set([...preserved,...remaining.filter(f=>f!==STATE),...entries.filter(e=>e.isDirectory()).map(e=>e.name+'/')])]};
+ } finally {await handle.close();await unlink(lock);}
 }

@@ -8,5 +8,5 @@ if errorlevel 1 (
 )
 node "%~dp0bin\antigravity-lean.mjs" wizard %*
 set "LEAN_EXIT=%ERRORLEVEL%"
-if not "%LEAN_EXIT%"=="0" pause
+pause
 exit /b %LEAN_EXIT%
