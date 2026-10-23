@@ -1,0 +1,33 @@
+{
+  "name": "antigravity-lean",
+  "version": "0.1.0",
+  "description": "Context-conscious Antigravity workflows and an Ultra family installation wizard",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "antigravity-lean": "bin/antigravity-lean.mjs"
+  },
+  "scripts": {
+    "test": "node --test",
+    "start": "node bin/antigravity-lean.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "rules",
+    "agents",
+    "skills",
+    "plugin.json",
+    "install.cmd",
+    "install.ps1",
+    "install.sh",
+    "README.md",
+    "README.en.md",
+    "LICENSE",
+    "docs"
+  ]
+}
