@@ -33,3 +33,9 @@ family aggregation, automatic model switching, or measured savings was tested or
 - Local Node wizard instead of a hosted service: portable filesystem behavior and no account backend.
 - Each member installs locally; availability values are manual snapshots, not telemetry.
 - Use current plugin format and documented paths; no guarantee for legacy versions.
+
+## One-command installation
+The public GitHub Release .tgz was executed via npx from a clean npm cache outside
+the source checkout. Help, project install, doctor, uninstall and interactive
+wizard cancellation succeeded. The cancellation target was not created.
+The .tgz contains the same runtime code as the verified ZIP, with updated docs.

@@ -16,7 +16,15 @@ Antigravity Lean allocates work according to task difficulty, model capabilities
 
 Requires Node.js >=20 ([official download](https://nodejs.org/)) and Antigravity App or agy CLI. No npm install or administrator privileges required.
 
-Download and extract the ZIP from [Releases](https://github.com/zinda2000/antigravity-lean/releases/latest). On Windows double-click `install.cmd`; on macOS/Linux run `sh install.sh`. Or:
+**Recommended: one command starts the interactive wizard on Windows/macOS/Linux.**
+
+```bash
+npx --yes https://github.com/zinda2000/antigravity-lean/releases/download/v0.1.0/antigravity-lean-0.1.0.tgz
+```
+
+No Git, clone or manual extraction required. npx downloads a pinned GitHub Release package. The wizard previews changes and asks for `yes` before writing plugin files. In PowerShell, use `npx.cmd` if script policy blocks `npx.ps1`; no policy changes needed. Append `doctor` or `uninstall --yes` to the same command to manage global installations; add `--scope project --project "PATH"` for project scope.
+
+Alternatively, download and extract the ZIP from [Releases](https://github.com/zinda2000/antigravity-lean/releases/latest). On Windows double-click `install.cmd`; on macOS/Linux run `sh install.sh`. Or:
 
 ```bash
 git clone https://github.com/zinda2000/antigravity-lean.git

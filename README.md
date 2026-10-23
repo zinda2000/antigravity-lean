@@ -19,7 +19,17 @@ Antigravity Lean 提倡按任务难度、模型能力和可用额度合理分配
 
 需要 **Node.js 20 或更新版本**（[官方下载](https://nodejs.org/)），以及已经安装的 Antigravity App 或 agy CLI。向导本身不需要 npm install，不需要管理员权限。
 
-**不熟悉 Git：** 下载 [最新 Release](https://github.com/zinda2000/antigravity-lean/releases/latest) 中的 ZIP，完整解压到普通文件夹。Windows 双击 `install.cmd`；macOS/Linux 在该目录执行 `sh install.sh`。
+**推荐：一行命令启动安装向导（Windows / macOS / Linux）**
+
+```bash
+npx --yes https://github.com/zinda2000/antigravity-lean/releases/download/v0.1.0/antigravity-lean-0.1.0.tgz
+```
+
+无需 Git、克隆或手动解压；npx 下载 GitHub Release 中固定版本的独立包，直接启动交互向导。全局或项目配置仍需在预览后输入 `yes` 才安装。Windows PowerShell 若拦截 `npx.ps1`，把命令开头换成 `npx.cmd`，无需调整系统策略。
+
+一行命令用户也可以在相同命令末尾追加 `doctor` 检查，或追加 `uninstall --yes` 卸载；项目安装时再追加 `--scope project --project "项目路径"`。
+
+**不熟悉 Git、偏好 ZIP：** 下载 [最新 Release](https://github.com/zinda2000/antigravity-lean/releases/latest) 中的 ZIP，完整解压到普通文件夹。Windows 双击 `install.cmd`；macOS/Linux 在该目录执行 `sh install.sh`。
 
 **熟悉 Git：**
 
