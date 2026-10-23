@@ -6,6 +6,10 @@
 
 **Each family member installs on their own computer. No account information is collected, and the tool does not assume access to the whole family's live quota.** Community project, not affiliated with Google. No API keys, sign-in, telemetry or hosted services.
 
+## Community acknowledgment
+
+This project recognizes and thanks the [LINUX DO community](https://linux.do/) for its platform for discussion and sharing. Community feedback and open-source discussions are welcome.
+
 ## Save quota and work faster
 
 Flash models typically respond faster and suit code searches, log analysis, routine edits and execution of an agreed plan. Faster feedback reduces waiting. Use stronger reasoning models for complex architecture, difficult debugging and consequential decisions.
