@@ -99,3 +99,16 @@ test('unrelated symlink is rejected before uninstall deletes anything',async t=>
  await assert.rejects(uninstall(options),/symbolic|symlink/i);
  await access(path.join(dir,'plugin.json'));await access(path.join(dir,'.lean-state.json'));
 });
+
+test('plugin discovery never sees the incomplete staging directory',async t=>{
+ const {options}=await fixture(t);
+ const parent=path.dirname(destination(options));await mkdir(parent,{recursive:true});
+ const {watch}=await import('node:fs');const names=[];
+ const watcher=watch(parent,(_event,name)=>{if(name)names.push(String(name));});
+ try{
+  await install(options);
+  await new Promise(resolve=>setTimeout(resolve,80));
+ }finally{watcher.close();}
+ assert.ok(names.some(n=>n==='antigravity-lean'),'observer sees the published plugin');
+ assert.equal(names.some(n=>n.startsWith('.antigravity-lean-stage-')),false,'temporary plugins must stay outside discovery');
+});

@@ -3,7 +3,7 @@ import {createInterface} from 'node:readline';
 import {install,doctor,uninstall,destination} from '../src/installer.mjs';
 import {profiles,statuses,normalize} from '../src/profiles.mjs';
 
-const HELP=`Antigravity Lean 0.1.0 — 省额度，也提高效率
+const HELP=`Antigravity Lean 0.1.1 — 省额度，也提高效率
 Node.js >=20. No npm dependencies. No account collection.
 
 Usage:
@@ -87,7 +87,7 @@ try{
  if(Number(process.versions.node.split('.')[0])<20)throw new Error('Node.js 20+ required: https://nodejs.org/');
  const {command,o}=parse(process.argv.slice(2));
  if(o.help)console.log(HELP);
- else if(o.version)console.log('0.1.0');
+ else if(o.version)console.log('0.1.1');
  else if(command==='wizard')await wizard(o);
  else {
   destination(o);

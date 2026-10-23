@@ -19,7 +19,7 @@ Requires Node.js >=20 ([official download](https://nodejs.org/)) and Antigravity
 **Recommended: one command starts the interactive wizard on Windows/macOS/Linux.**
 
 ```bash
-npx --yes https://github.com/zinda2000/antigravity-lean/releases/download/v0.1.0/antigravity-lean-0.1.0.tgz
+npx --yes https://github.com/zinda2000/antigravity-lean/releases/download/v0.1.1/antigravity-lean-0.1.1.tgz
 ```
 
 No Git, clone or manual extraction required. npx downloads a pinned GitHub Release package. The wizard previews changes and asks for `yes` before writing plugin files. In PowerShell, use `npx.cmd` if script policy blocks `npx.ps1`; no policy changes needed. Append `doctor` or `uninstall --yes` to the same command to manage global installations; add `--scope project --project "PATH"` for project scope.

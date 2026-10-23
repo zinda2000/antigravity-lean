@@ -22,7 +22,7 @@ Antigravity Lean 提倡按任务难度、模型能力和可用额度合理分配
 **推荐：一行命令启动安装向导（Windows / macOS / Linux）**
 
 ```bash
-npx --yes https://github.com/zinda2000/antigravity-lean/releases/download/v0.1.0/antigravity-lean-0.1.0.tgz
+npx --yes https://github.com/zinda2000/antigravity-lean/releases/download/v0.1.1/antigravity-lean-0.1.1.tgz
 ```
 
 无需 Git、克隆或手动解压；npx 下载 GitHub Release 中固定版本的独立包，直接启动交互向导。全局或项目配置仍需在预览后输入 `yes` 才安装。Windows PowerShell 若拦截 `npx.ps1`，把命令开头换成 `npx.cmd`，无需调整系统策略。

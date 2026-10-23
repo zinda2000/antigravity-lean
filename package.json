@@ -1,6 +1,6 @@
 {
   "name": "antigravity-lean",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Context-conscious Antigravity workflows and an Ultra family installation wizard",
   "type": "module",
   "private": true,
@@ -12,7 +12,7 @@
     "antigravity-lean": "bin/antigravity-lean.mjs"
   },
   "scripts": {
-    "test": "node --test",
+    "test": "node --test test/installer.test.mjs test/cli.test.mjs test/rename-directory.test.mjs",
     "start": "node bin/antigravity-lean.mjs"
   },
   "files": [

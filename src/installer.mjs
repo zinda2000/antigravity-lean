@@ -1,8 +1,9 @@
-import { lstat, readFile, writeFile, mkdir, readdir, rename, unlink, rmdir, mkdtemp, rm } from 'node:fs/promises';
+import { lstat, readFile, writeFile, mkdir, readdir, unlink, rmdir, mkdtemp, rm } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { createHash, randomUUID } from 'node:crypto';
 import { render, normalize } from './profiles.mjs';
+import { renameDirectory } from './rename-directory.mjs';
 
 const STATE='.lean-state.json';
 const ALLOWED=new Set(['plugin.json','rules/context-hygiene.md','rules/model-routing.md','skills/plan-handoff/SKILL.md','agents/lean-explorer.md']);
@@ -86,7 +87,7 @@ export async function install(options={}) {
  const handle=await import('node:fs/promises').then(fs=>fs.open(lock,'wx')).catch(e=>{
   if(e.code==='EEXIST') throw new Error('Another install is running, or stale lock exists: '+lock);throw e;
  });
- let stage,backup;
+ let stage,backup,failure;
  try {
   // Recheck after acquiring the lock, before touching a previously inspected destination.
   if(prior) {
@@ -94,22 +95,41 @@ export async function install(options={}) {
    const current=await stateAt(dir);
    if(JSON.stringify(current)!==JSON.stringify(prior))throw new Error('Installation changed; run again');
   } else if(await stat(dir)) throw new Error('Unmanaged destination appeared; run again');
-  stage=await mkdtemp(path.join(parent,'.antigravity-lean-stage-'));
+  // Keep incomplete plugin.json/rules outside the directory watched by plugin discovery.
+  stage=await mkdtemp(path.join(path.dirname(parent),'.antigravity-lean-stage-'));
   for(const [file,data] of Object.entries(files)) {
    const target=path.join(stage,file);await mkdir(path.dirname(target),{recursive:true});
    await writeFile(target,data,{flag:'wx'});
   }
-  await writeFile(path.join(stage,STATE),JSON.stringify({schema:1,name:'antigravity-lean',version:'0.1.0',config,files:digests},null,2)+'\n',{flag:'wx'});
+  await writeFile(path.join(stage,STATE),JSON.stringify({schema:1,name:'antigravity-lean',version:'0.1.1',config,files:digests},null,2)+'\n',{flag:'wx'});
   if(prior) {
    const backups=path.join(parent,'.antigravity-lean-backups');await noLinks(backups);await mkdir(backups,{recursive:true});
-   backup=path.join(backups,Date.now()+'-'+randomUUID());await rename(dir,backup);
+   backup=path.join(backups,Date.now()+'-'+randomUUID());await renameDirectory(dir,backup);
   }
-  try {await rename(stage,dir);stage=null;}
-  catch(e) {if(backup) await rename(backup,dir);throw e;}
+  try {await renameDirectory(stage,dir);stage=null;}
+  catch(e) {
+   if(backup) {
+    try {await renameDirectory(backup,dir);}
+    catch(rollback) {
+     throw new AggregateError([e,rollback],
+      'Installation failed and rollback was blocked. Your previous installation is preserved at: '+backup+
+      '. Close programs using the plugin directory before restoring it. '+e.message+' Rollback: '+rollback.message);
+    }
+   }
+   throw e;
+  }
   return {action:prior?'updated':'installed',destination:dir,backup,config};
- } finally {
-  if(stage) await rm(stage,{recursive:true,force:true});
-  await handle.close();await unlink(lock);
+ } catch(error) {failure=error;throw error;}
+ finally {
+  try {
+   if(stage)await rm(stage,{recursive:true,force:true,maxRetries:3,retryDelay:100});
+  } catch(cleanup) {
+   if(failure)failure.message+=' Temporary directory cleanup was blocked; retained at '+stage+'. '+cleanup.message;
+   else throw cleanup;
+  } finally {
+   // A locked staging directory must never strand the separate installation lock.
+   await handle.close();await unlink(lock);
+  }
  }
 }
 export async function uninstall(options={}) {
