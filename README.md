@@ -65,7 +65,7 @@ Windows 也可以运行 `.\install.ps1`。若系统策略不允许运行脚本�
 | gemini-first | Gemini 4 Argon Medium | Gemini 3.8 Flash Medium | Gemini 4 Argon Medium |
 | claude-first | Claude Opus 5.5 Medium | Claude Sonnet 5.5 Medium | Claude Sonnet 5.5 Medium |
 
-这些名称来自用户提供的 2026 年 10 月界面，只是可编辑的显示名称，不是通用 API 模型 ID。可用模型以自己的账户为准；更强模型与复核都按需使用，不要求每个任务调用。GPT-OSS 120B (Medium) 可手动选用。
+这些名称来自用户提供的 2026 年 10 月界面，只是可编辑的显示名称，不是通用 API 模型 ID。可用模型以自己的账户为准；更强模型与复核都按需使用，不要求每个任务调用。
 
 **额度边界：**
 
